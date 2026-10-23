@@ -61,6 +61,12 @@ final class Autoscroller {
     private var target: TargetWindow?
     private var pointerOnTarget = true
     private var lastTargetCheck: TimeInterval = 0
+    /// Where the pointer is while the button is held. Its drags are swallowed, and then the system's
+    /// "current location" stays where it last saw an event, so we follow the drags ourselves.
+    private var dragPointer: CGPoint?
+    /// `defaults write local.mouseremap debugScroll -bool true` also logs autoscroll ticks.
+    private let debug = UserDefaults.standard.bool(forKey: "debugScroll")
+    private var lastDebugLog: TimeInterval = 0
 
     /// Presses that ended autoscroll are eaten; so are their drags and releases.
     private var swallowButtons = Set<Int>()
@@ -132,6 +138,7 @@ final class Autoscroller {
             if type == .otherMouseUp { state = .idle }
             return .pass
         case .held(let b, let moved) where b == button:
+            dragPointer = event.location
             let beyond = moved || outsideDeadZone(event.location)
             if type == .otherMouseUp {
                 if beyond { stop() } else { state = .toggled }   // hold mode ends; a plain click toggles
@@ -177,6 +184,7 @@ final class Autoscroller {
 
         anchor = first.location
         axes = result
+        dragPointer = queued.last { $0.type == .otherMouseDragged }?.location
         let beyond = outsideDeadZone(currentPointer())
         if released {
             if beyond { state = .idle; return }   // a whole hold-and-move happened before we knew
@@ -247,6 +255,10 @@ final class Autoscroller {
               let e = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 2,
                               wheel1: Int32(stepY), wheel2: Int32(stepX), wheel3: 0) else { return }
         e.tagAsOurs()
+        if debug, now - lastDebugLog > 0.5 {
+            lastDebugLog = now
+            NSLog("MouseRemap autoscroll: \(state) pointer \(p) system \(CGEvent(source: nil)?.location ?? .zero) anchor \(anchor) step \(stepX),\(stepY) onTarget \(pointerOnTarget)")
+        }
         if now - lastTargetCheck > 0.1, let target = target {
             lastTargetCheck = now
             pointerOnTarget = TargetWindow.at(p)?.id == target.id
@@ -277,7 +289,8 @@ final class Autoscroller {
     }
 
     private func currentPointer() -> CGPoint {
-        CGEvent(source: nil)?.location ?? anchor
+        if case .held = state, let p = dragPointer { return p }
+        return CGEvent(source: nil)?.location ?? anchor
     }
 
     // MARK: - Left/right buttons and keys (second tap, on only while needed)
