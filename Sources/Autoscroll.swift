@@ -8,7 +8,7 @@ enum AutoscrollTuning {
     /// move while the button is held to count as "hold mode".
     static let deadZone: CGFloat = 15
     /// Speed per axis in px/s: gain × (Settings slider) × (distance past the dead zone)^exponent.
-    static let gain: Double = 1.0
+    static let gain: Double = 1.5
     static let exponent: Double = 1.5
     static let maxSpeed: Double = 8000
     /// How often scroll events are posted (Hz).
@@ -57,6 +57,10 @@ final class Autoscroller {
     private var timer: Timer?
     private var lastTick: TimeInterval = 0
     private var carryX = 0.0, carryY = 0.0
+    /// The window under the anchor, and whether the pointer is still over it (rechecked a few times a second).
+    private var target: TargetWindow?
+    private var pointerOnTarget = true
+    private var lastTargetCheck: TimeInterval = 0
 
     /// Presses that ended autoscroll are eaten; so are their drags and releases.
     private var swallowButtons = Set<Int>()
@@ -206,6 +210,9 @@ final class Autoscroller {
         carryX = 0
         carryY = 0
         lastTick = ProcessInfo.processInfo.systemUptime
+        target = TargetWindow.at(anchor)
+        pointerOnTarget = true
+        lastTargetCheck = lastTick
         marker.show(at: anchor, axes: axes)
         updateAuxTap()
         timer?.invalidate()
@@ -239,10 +246,22 @@ final class Autoscroller {
         guard stepX != 0 || stepY != 0,
               let e = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 2,
                               wheel1: Int32(stepY), wheel2: Int32(stepX), wheel3: 0) else { return }
-        // Aim at the window under the anchor, wherever the pointer has wandered (as on Windows).
-        e.location = anchor
         e.tagAsOurs()
-        e.post(tap: .cgSessionEventTap)
+        if now - lastTargetCheck > 0.1, let target = target {
+            lastTargetCheck = now
+            pointerOnTarget = TargetWindow.at(p)?.id == target.id
+        }
+        if pointerOnTarget || target == nil {
+            // Keep the event at the pointer: a posted event's location moves the cursor there.
+            e.post(tap: .cgSessionEventTap)
+        } else if let target = target {
+            // The pointer wandered over another window: keep scrolling the original one (as on Windows)
+            // by sending straight to its app, which doesn't move the cursor.
+            e.location = anchor
+            e.setIntegerValueField(.mouseEventWindowUnderMousePointer, value: Int64(target.id))
+            e.setIntegerValueField(.mouseEventWindowUnderMousePointerThatCanHandleThisEvent, value: Int64(target.id))
+            e.postToPid(target.pid)
+        }
     }
 
     /// Signed px/s for an offset along one axis.
@@ -342,6 +361,29 @@ private func autoscrollTapCallback(proxy: CGEventTapProxy,
                                    refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
     if event.isOurs { return Unmanaged.passUnretained(event) }
     return Autoscroller.shared.handleAux(type: type, event: event)
+}
+
+/// An on-screen window of another app.
+struct TargetWindow {
+    let id: CGWindowID
+    let pid: pid_t
+
+    /// The frontmost window at a point (CG coordinates), skipping our own (the marker, Settings).
+    static func at(_ p: CGPoint) -> TargetWindow? {
+        guard let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements],
+                                                    kCGNullWindowID) as? [[String: Any]] else { return nil }
+        let me = getpid()
+        for w in list { // front to back
+            guard let pid = w[kCGWindowOwnerPID as String] as? pid_t, pid != me,
+                  let id = w[kCGWindowNumber as String] as? CGWindowID,
+                  (w[kCGWindowAlpha as String] as? Double ?? 1) > 0,
+                  let bounds = w[kCGWindowBounds as String] as? NSDictionary,
+                  let rect = CGRect(dictionaryRepresentation: bounds as CFDictionary),
+                  rect.contains(p) else { continue }
+            return TargetWindow(id: id, pid: pid)
+        }
+        return nil
+    }
 }
 
 struct ScrollAxes: Equatable {
