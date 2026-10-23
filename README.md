@@ -31,7 +31,7 @@ To use your own shortcut, choose **Custom shortcut…** and press the key combin
 
 ## Autoscroll
 
-Set **Wheel click** to **Autoscroll (Windows style)**.
+The wheel click does **Autoscroll (Windows style)** out of the box (set it to "Default (no change)" to turn it off).
 
 - **Click** the wheel over a page or list: a round marker appears. Move the mouse away from it to scroll; the further away, the faster. Inside a small circle around the marker nothing scrolls.
 - **Hold** the wheel and move: scrolls while held, stops when you let go.

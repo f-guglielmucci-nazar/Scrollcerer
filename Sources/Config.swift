@@ -21,6 +21,7 @@ final class Config: ObservableObject {
     @Published private(set) var extraButtons: [Int]
 
     static let defaultMappings: [Int: ButtonAction] = [
+        2: ButtonAction(kind: .autoscroll),
         3: ButtonAction(kind: .back),
         4: ButtonAction(kind: .forward),
     ]
@@ -32,6 +33,9 @@ final class Config: ObservableObject {
         autoscrollSpeed = d.object(forKey: "autoscrollSpeed") as? Double ?? 1.0
         if let data = d.data(forKey: "mappings"),
            let saved = try? JSONDecoder().decode([Int: ButtonAction].self, from: data) {
+            var saved = saved
+            // Settings saved before autoscroll existed: a wheel click never set gets the new default.
+            if saved[2] == nil { saved[2] = Config.defaultMappings[2] }
             mappings = saved
         } else {
             mappings = Config.defaultMappings
