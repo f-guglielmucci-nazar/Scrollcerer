@@ -74,14 +74,26 @@ final class Remapper {
                 }
             }
 
-            if config.enabled, config.reverseWheel, isMouseWheel {
-                event.setIntegerValueField(.scrollWheelEventDeltaAxis1,
-                                           value: -event.getIntegerValueField(.scrollWheelEventDeltaAxis1))
-                event.setIntegerValueField(.scrollWheelEventPointDeltaAxis1,
-                                           value: -event.getIntegerValueField(.scrollWheelEventPointDeltaAxis1))
-                event.setDoubleValueField(.scrollWheelEventFixedPtDeltaAxis1,
-                                          value: -event.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis1))
+            guard config.enabled, isMouseWheel else { return pass }
+            if Remapper.debugScroll { NSLog("MouseRemap scroll in:  \(Remapper.describe(event))") }
+
+            // Lines per notch: with acceleration off every notch scrolls exactly that many lines;
+            // with it on, the accelerated amount is multiplied instead.
+            let lines = Double(config.wheelLines)
+            let shape: (Double) -> Double
+            if config.linearWheel {
+                let perNotch = lines > 0 ? lines : 1
+                shape = { $0 < 0 ? -perNotch : perNotch }
+            } else if lines > 0 {
+                shape = { $0 * lines }
+            } else {
+                shape = { $0 }
             }
+            let flip: Double = config.reverseWheel ? -1 : 1
+            Remapper.rewrite(event, Remapper.vertical) { flip * shape($0) }
+            Remapper.rewrite(event, Remapper.horizontal, shape)
+
+            if Remapper.debugScroll { NSLog("MouseRemap scroll out: \(Remapper.describe(event))") }
             return pass
 
         case .otherMouseDown, .otherMouseUp, .otherMouseDragged:
@@ -122,6 +134,49 @@ final class Remapper {
         default:
             return pass
         }
+    }
+
+    // MARK: - Wheel deltas
+
+    /// `defaults write local.mouseremap debugScroll -bool true` logs wheel events before and after rewriting.
+    private static let debugScroll = UserDefaults.standard.bool(forKey: "debugScroll")
+
+    private struct Axis {
+        let lines: CGEventField   // integer lines
+        let points: CGEventField  // pixels
+        let fixed: CGEventField   // fractional lines (what most apps read)
+    }
+    private static let vertical = Axis(lines: .scrollWheelEventDeltaAxis1,
+                                       points: .scrollWheelEventPointDeltaAxis1,
+                                       fixed: .scrollWheelEventFixedPtDeltaAxis1)
+    private static let horizontal = Axis(lines: .scrollWheelEventDeltaAxis2,
+                                         points: .scrollWheelEventPointDeltaAxis2,
+                                         fixed: .scrollWheelEventFixedPtDeltaAxis2)
+
+    /// Makes one axis of a wheel event scroll `transform(lines)` lines, scaling all three delta fields
+    /// together so macOS's pixels-per-line stays as it was. Everything is read before anything is
+    /// written, because writing the line delta makes CoreGraphics recompute the other two.
+    private static func rewrite(_ event: CGEvent, _ axis: Axis, _ transform: (Double) -> Double) {
+        let lines = event.getIntegerValueField(axis.lines)
+        let points = event.getIntegerValueField(axis.points)
+        let fixed = event.getDoubleValueField(axis.fixed)
+        let amount = fixed != 0 ? fixed : Double(lines)
+        guard amount != 0 else { return }
+        let target = transform(amount)
+        guard target != amount else { return }
+        let scale = target / amount
+
+        var newLines = (Double(lines) * scale).rounded()
+        if newLines == 0 { newLines = target < 0 ? -1 : 1 } // a notch always moves at least a line
+        event.setIntegerValueField(axis.lines, value: Int64(newLines))
+        event.setIntegerValueField(axis.points, value: Int64((Double(points) * scale).rounded()))
+        event.setDoubleValueField(axis.fixed, value: fixed != 0 ? fixed * scale : target)
+    }
+
+    private static func describe(_ e: CGEvent) -> String {
+        "lines \(e.getIntegerValueField(.scrollWheelEventDeltaAxis1))/\(e.getIntegerValueField(.scrollWheelEventDeltaAxis2)) " +
+            "points \(e.getIntegerValueField(.scrollWheelEventPointDeltaAxis1))/\(e.getIntegerValueField(.scrollWheelEventPointDeltaAxis2)) " +
+            "fixed \(e.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis1))/\(e.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis2))"
     }
 
     /// When was the last scroll event seen for each tilt direction.

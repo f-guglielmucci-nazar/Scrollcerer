@@ -13,6 +13,14 @@ final class Config: ObservableObject {
     @Published var reverseWheel: Bool {
         didSet { UserDefaults.standard.set(reverseWheel, forKey: "reverseWheel") }
     }
+    /// Mouse wheel without acceleration: every notch scrolls the same amount.
+    @Published var linearWheel: Bool {
+        didSet { UserDefaults.standard.set(linearWheel, forKey: "linearWheel") }
+    }
+    /// Lines per wheel notch; 0 = leave it to macOS.
+    @Published var wheelLines: Int {
+        didSet { UserDefaults.standard.set(wheelLines, forKey: "wheelLines") }
+    }
     /// Multiplier on autoscroll speed (Settings slider).
     @Published var autoscrollSpeed: Double {
         didSet { UserDefaults.standard.set(autoscrollSpeed, forKey: "autoscrollSpeed") }
@@ -31,6 +39,8 @@ final class Config: ObservableObject {
         enabled = d.object(forKey: "enabled") as? Bool ?? true
         reverseWheel = d.bool(forKey: "reverseWheel")
         autoscrollSpeed = d.object(forKey: "autoscrollSpeed") as? Double ?? 1.0
+        linearWheel = d.bool(forKey: "linearWheel")
+        wheelLines = d.integer(forKey: "wheelLines")
         if let data = d.data(forKey: "mappings"),
            let saved = try? JSONDecoder().decode([Int: ButtonAction].self, from: data) {
             var saved = saved
@@ -82,6 +92,8 @@ final class Config: ObservableObject {
         mappings = Config.defaultMappings
         reverseWheel = false
         autoscrollSpeed = 1.0
+        linearWheel = false
+        wheelLines = 0
         enabled = true
         save()
     }

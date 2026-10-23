@@ -42,6 +42,29 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Toggle("Reverse scroll direction for the mouse wheel (trackpad stays as it is)",
                            isOn: $config.reverseWheel)
+                    Toggle("Turn off scroll acceleration for the mouse wheel",
+                           isOn: $config.linearWheel)
+                    HStack(spacing: 8) {
+                        Text("Lines per wheel notch")
+                        Picker("", selection: $config.wheelLines) {
+                            Text("macOS default").tag(0)
+                            Divider()
+                            ForEach([1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20], id: \.self) { n in
+                                Text("\(n)").tag(n)
+                            }
+                        }
+                        .labelsHidden()
+                        .frame(width: 140)
+                    }
+                    Text(config.linearWheel
+                         ? "Every notch scrolls exactly this many lines (1 with \"macOS default\"), however fast you spin."
+                         : "Each notch scrolls this many times more than usual; spinning faster still speeds up.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text("These only change the mouse wheel; the trackpad stays as it is.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                     if config.usesAutoscroll {
                         HStack(spacing: 8) {
                             Text("Autoscroll speed")

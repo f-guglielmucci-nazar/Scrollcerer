@@ -5,7 +5,7 @@ A small menu-bar app for remapping the extra buttons on a TeckNet MG2511 (or any
 - **Side buttons** work as Back / Forward out of the box (macOS doesn't do anything with them by default).
 - Each side button, the wheel click, and **tilting the wheel left / right** can be set to: Back, Forward, tab switching, Mission Control, App Exposé, Show Desktop, switching Desktops, Copy / Paste / Undo, screenshot, Spotlight, media keys, middle click, nothing at all, or **any keyboard shortcut you record**.
 - **Windows-style autoscroll** on the wheel click (or any button): click and move the mouse to scroll, the further away the faster. Links, browser tabs and the Dock still get a normal middle click.
-- **Reverse scroll** for the mouse wheel only, so your trackpad keeps natural scrolling.
+- **Reverse scroll**, **no scroll acceleration** and **lines per wheel notch** for the mouse wheel only, so your trackpad keeps working as it does.
 - Press a mouse button in Settings and its row lights up, so you know which physical button is which.
 - Optional "Open at login".
 
