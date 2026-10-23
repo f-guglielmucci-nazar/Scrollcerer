@@ -23,6 +23,12 @@ A small menu-bar app for remapping the extra buttons on a TeckNet MG2511 (or any
 
 3. When asked, go to **System Settings → Privacy & Security → Accessibility** and switch **MouseRemap** on. (This is what lets it see and change mouse clicks.) The Settings window notices automatically once it's allowed.
 
+## Share it
+
+Run `bash make_dmg.sh`. It builds a version for both Apple silicon and Intel Macs and puts it in `dist/MouseRemap-<version>.dmg` (your installed copy isn't touched). Send that file.
+
+The app isn't signed with an Apple Developer ID, so the first time someone opens it macOS blocks it. They go to **System Settings → Privacy & Security**, click **Open Anyway** next to the MouseRemap message, and confirm. The DMG includes a "Read Me First" file with these steps.
+
 ## Use
 
 Click the mouse icon in the menu bar → **Settings…** and pick an action for each button.
