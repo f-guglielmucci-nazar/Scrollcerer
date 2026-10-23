@@ -42,6 +42,8 @@ final class Remapper {
 
     fileprivate func handle(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
         let pass = Unmanaged.passUnretained(event)
+        // Our own synthetic events (autoscroll, replayed middle clicks) go through untouched.
+        if event.isOurs { return pass }
 
         switch type {
         case .tapDisabledByTimeout, .tapDisabledByUserInput:
@@ -53,6 +55,15 @@ final class Remapper {
             let config = Config.shared
             // Continuous = trackpad / Magic Mouse. Only touch a regular notched wheel.
             let isMouseWheel = event.getIntegerValueField(.scrollWheelEventIsContinuous) == 0
+
+            // A real scroll or tilt ends autoscroll and goes through as it is.
+            if Autoscroller.shared.isScrolling {
+                Autoscroller.shared.realScroll()
+                let now = ProcessInfo.processInfo.systemUptime
+                lastTiltTime[Config.tiltLeft] = now   // a held tilt shouldn't then fire its action
+                lastTiltTime[Config.tiltRight] = now
+                return pass
+            }
 
             // Wheel tilt: a sideways-only scroll from the mouse wheel (Shift+scroll is left alone).
             if isMouseWheel, !event.flags.contains(.maskShift) {
@@ -79,6 +90,12 @@ final class Remapper {
                 DispatchQueue.main.async { self.onButton?(button) }
             }
 
+            switch Autoscroller.shared.intercept(type: type, event: event, button: button) {
+            case .swallow: return nil
+            case .pass: return pass
+            case .notMine: break
+            }
+
             let config = Config.shared
             guard config.enabled else { return pass }
             let action = config.action(for: button)
@@ -86,6 +103,9 @@ final class Remapper {
             switch action.kind {
             case .passthrough:
                 return pass
+            case .autoscroll:
+                if type == .otherMouseDown { Autoscroller.shared.begin(button: button, event: event) }
+                return nil // the down/drag/up are held back until we know whether it's a click
             case .middleClick:
                 // Re-label the event as a middle-button event; drags keep working.
                 event.setIntegerValueField(.mouseEventButtonNumber, value: 2)
@@ -124,7 +144,7 @@ final class Remapper {
         let action = config.action(for: tilt)
 
         switch action.kind {
-        case .passthrough:
+        case .passthrough, .autoscroll: // a tilt has no press/release, so autoscroll doesn't apply
             return pass
         case .disabled:
             return nil

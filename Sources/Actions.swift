@@ -11,7 +11,7 @@ struct Shortcut: Codable, Equatable {
 
 /// Everything a mouse button can be turned into.
 enum ActionKind: String, Codable, CaseIterable, Identifiable {
-    case passthrough, disabled, middleClick
+    case passthrough, disabled, middleClick, autoscroll
     case back, forward, nextTab, previousTab, closeTab, reopenTab
     case missionControl, appExpose, showDesktop, spaceLeft, spaceRight
     case copy, paste, undo, screenshot, spotlight
@@ -22,7 +22,7 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
 
     /// Grouping used for the pop-up menus (a divider goes between groups).
     static let groups: [[ActionKind]] = [
-        [.passthrough, .disabled, .middleClick],
+        [.passthrough, .disabled, .middleClick, .autoscroll],
         [.back, .forward, .nextTab, .previousTab, .closeTab, .reopenTab],
         [.missionControl, .appExpose, .showDesktop, .spaceLeft, .spaceRight],
         [.copy, .paste, .undo, .screenshot, .spotlight],
@@ -35,6 +35,7 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
         case .passthrough:    return "Default (no change)"
         case .disabled:       return "Do nothing"
         case .middleClick:    return "Middle click"
+        case .autoscroll:     return "Autoscroll (Windows style)"
         case .back:           return "Back  ⌘["
         case .forward:        return "Forward  ⌘]"
         case .nextTab:        return "Next tab  ⌃⇥"
@@ -81,7 +82,7 @@ enum Actions {
 
     static func perform(_ action: ButtonAction) {
         switch action.kind {
-        case .passthrough, .disabled, .middleClick:
+        case .passthrough, .disabled, .middleClick, .autoscroll:
             break // handled directly in the event tap
         case .back:           appKey(kLeftBracket, .maskCommand, char: "[")
         case .forward:        appKey(kRightBracket, .maskCommand, char: "]")

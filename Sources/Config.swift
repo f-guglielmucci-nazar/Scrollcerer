@@ -13,6 +13,10 @@ final class Config: ObservableObject {
     @Published var reverseWheel: Bool {
         didSet { UserDefaults.standard.set(reverseWheel, forKey: "reverseWheel") }
     }
+    /// Multiplier on autoscroll speed (Settings slider).
+    @Published var autoscrollSpeed: Double {
+        didSet { UserDefaults.standard.set(autoscrollSpeed, forKey: "autoscrollSpeed") }
+    }
     @Published private(set) var mappings: [Int: ButtonAction]
     @Published private(set) var extraButtons: [Int]
 
@@ -25,6 +29,7 @@ final class Config: ObservableObject {
         let d = UserDefaults.standard
         enabled = d.object(forKey: "enabled") as? Bool ?? true
         reverseWheel = d.bool(forKey: "reverseWheel")
+        autoscrollSpeed = d.object(forKey: "autoscrollSpeed") as? Double ?? 1.0
         if let data = d.data(forKey: "mappings"),
            let saved = try? JSONDecoder().decode([Int: ButtonAction].self, from: data) {
             mappings = saved
@@ -50,6 +55,14 @@ final class Config: ObservableObject {
         mappings[button] ?? ButtonAction(kind: .passthrough)
     }
 
+    var usesAutoscroll: Bool {
+        mappings.values.contains { $0.kind == .autoscroll }
+    }
+
+    static func isTilt(_ button: Int) -> Bool {
+        button == tiltLeft || button == tiltRight
+    }
+
     func setAction(_ action: ButtonAction, for button: Int) {
         mappings[button] = action
         save()
@@ -64,6 +77,7 @@ final class Config: ObservableObject {
     func resetDefaults() {
         mappings = Config.defaultMappings
         reverseWheel = false
+        autoscrollSpeed = 1.0
         enabled = true
         save()
     }

@@ -39,10 +39,20 @@ struct SettingsView: View {
             }
 
             GroupBox(label: Text("Scroll wheel")) {
-                Toggle("Reverse scroll direction for the mouse wheel (trackpad stays as it is)",
-                       isOn: $config.reverseWheel)
-                    .padding(8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 10) {
+                    Toggle("Reverse scroll direction for the mouse wheel (trackpad stays as it is)",
+                           isOn: $config.reverseWheel)
+                    if config.usesAutoscroll {
+                        HStack(spacing: 8) {
+                            Text("Autoscroll speed")
+                            Text("Slower").font(.caption).foregroundColor(.secondary)
+                            Slider(value: $config.autoscrollSpeed, in: 0.3...3)
+                            Text("Faster").font(.caption).foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             HStack {
@@ -89,7 +99,7 @@ struct ButtonRow: View {
                 Picker("", selection: selection) {
                     ForEach(ActionKind.groups.indices, id: \.self) { i in
                         if i > 0 { Divider() }
-                        ForEach(ActionKind.groups[i]) { kind in
+                        ForEach(ActionKind.groups[i].filter { $0 != .autoscroll || !Config.isTilt(button) }) { kind in
                             Text(kind.title).tag(kind)
                         }
                     }
@@ -110,6 +120,11 @@ struct ButtonRow: View {
                 }
                 .font(.caption)
                 .padding(.leading, labelWidth + 19)
+            } else if action.kind == .autoscroll {
+                Text("Click to toggle, or hold and move. Links and tabs still get a normal middle click.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.leading, labelWidth + 19)
             }
         }
     }

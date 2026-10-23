@@ -4,6 +4,7 @@ A small menu-bar app for remapping the extra buttons on a TeckNet MG2511 (or any
 
 - **Side buttons** work as Back / Forward out of the box (macOS doesn't do anything with them by default).
 - Each side button, the wheel click, and **tilting the wheel left / right** can be set to: Back, Forward, tab switching, Mission Control, App Exposé, Show Desktop, switching Desktops, Copy / Paste / Undo, screenshot, Spotlight, media keys, middle click, nothing at all, or **any keyboard shortcut you record**.
+- **Windows-style autoscroll** on the wheel click (or any button): click and move the mouse to scroll, the further away the faster. Links, browser tabs and the Dock still get a normal middle click.
 - **Reverse scroll** for the mouse wheel only, so your trackpad keeps natural scrolling.
 - Press a mouse button in Settings and its row lights up, so you know which physical button is which.
 - Optional "Open at login".
@@ -27,6 +28,19 @@ A small menu-bar app for remapping the extra buttons on a TeckNet MG2511 (or any
 Click the mouse icon in the menu bar → **Settings…** and pick an action for each button.
 
 To use your own shortcut, choose **Custom shortcut…** and press the key combination. Esc cancels.
+
+## Autoscroll
+
+Set **Wheel click** to **Autoscroll (Windows style)**.
+
+- **Click** the wheel over a page or list: a round marker appears. Move the mouse away from it to scroll; the further away, the faster. Inside a small circle around the marker nothing scrolls.
+- **Hold** the wheel and move: scrolls while held, stops when you let go.
+- Ends with any mouse click (that click is not passed on, as on Windows), Esc, any other key (which still types), turning the wheel, or switching apps.
+- Middle-clicking a **link** (open in new tab), a **browser tab** (close it), the Dock or other non-scrolling UI still sends a normal middle click.
+- Scrolling stays with the window you started in, even if the pointer wanders over another one.
+- The speed slider is under **Scroll wheel** in Settings.
+- **Firefox** has its own autoscroll (Settings → General → Browsing → "Use autoscrolling", off by default on Mac). Leave it off, or the two will fight.
+- In Chrome, Edge, Brave, Arc and Electron apps (VS Code, Slack…) MouseRemap switches on their full accessibility info so it can tell links from pages. The very first wheel click after launching such an app may be a plain middle click.
 
 ## Notes
 
