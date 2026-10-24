@@ -36,6 +36,7 @@ final class Config: ObservableObject {
 
     private init() {
         let d = UserDefaults.standard
+        Config.importOldSettings(into: d)
         enabled = d.object(forKey: "enabled") as? Bool ?? true
         reverseWheel = d.bool(forKey: "reverseWheel")
         autoscrollSpeed = d.object(forKey: "autoscrollSpeed") as? Double ?? 1.0
@@ -51,6 +52,17 @@ final class Config: ObservableObject {
             mappings = Config.defaultMappings
         }
         extraButtons = d.array(forKey: "extraButtons") as? [Int] ?? []
+    }
+
+    /// The app used to be called MouseRemap (bundle id local.mouseremap). Bring its settings over once.
+    private static func importOldSettings(into d: UserDefaults) {
+        guard !d.bool(forKey: "importedOldSettings") else { return }
+        d.set(true, forKey: "importedOldSettings")
+        guard let old = UserDefaults(suiteName: "local.mouseremap")?.persistentDomain(forName: "local.mouseremap") else { return }
+        for key in ["enabled", "reverseWheel", "linearWheel", "wheelLines", "autoscrollSpeed",
+                    "mappings", "extraButtons", "launchedBefore"] where d.object(forKey: key) == nil {
+            if let value = old[key] { d.set(value, forKey: key) }
+        }
     }
 
     /// Pseudo button numbers for tilting the wheel (these arrive as sideways scrolling).
@@ -156,7 +168,7 @@ enum Permissions {
         do {
             if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
         } catch {
-            NSLog("MouseRemap: login item change failed: \(error)")
+            NSLog("Scrollmate: login item change failed: \(error)")
         }
         return launchAtLogin
     }

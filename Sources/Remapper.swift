@@ -75,7 +75,7 @@ final class Remapper {
             }
 
             guard config.enabled, isMouseWheel else { return pass }
-            if Remapper.debugScroll { NSLog("MouseRemap scroll in:  \(Remapper.describe(event))") }
+            if Remapper.debugScroll { NSLog("Scrollmate scroll in:  \(Remapper.describe(event))") }
 
             // Lines per notch: with acceleration off every notch scrolls exactly that many lines;
             // with it on, the accelerated amount is multiplied instead.
@@ -93,7 +93,7 @@ final class Remapper {
             Remapper.rewrite(event, Remapper.vertical) { flip * shape($0) }
             Remapper.rewrite(event, Remapper.horizontal, shape)
 
-            if Remapper.debugScroll { NSLog("MouseRemap scroll out: \(Remapper.describe(event))") }
+            if Remapper.debugScroll { NSLog("Scrollmate scroll out: \(Remapper.describe(event))") }
             return pass
 
         case .otherMouseDown, .otherMouseUp, .otherMouseDragged:
@@ -138,7 +138,7 @@ final class Remapper {
 
     // MARK: - Wheel deltas
 
-    /// `defaults write local.mouseremap debugScroll -bool true` logs wheel events before and after rewriting.
+    /// `defaults write local.scrollmate debugScroll -bool true` logs wheel events before and after rewriting.
     private static let debugScroll = UserDefaults.standard.bool(forKey: "debugScroll")
 
     private struct Axis {

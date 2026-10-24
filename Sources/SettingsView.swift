@@ -9,9 +9,9 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 16) {
             if !status.trusted {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("One more step: let MouseRemap see your mouse")
+                    Text("One more step: let Scrollmate see your mouse")
                         .font(.headline)
-                    Text("Open System Settings → Privacy & Security → Accessibility and switch MouseRemap on. This window updates by itself once it's allowed.")
+                    Text("Open System Settings → Privacy & Security → Accessibility and switch Scrollmate on. This window updates by itself once it's allowed.")
                         .font(.callout)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)

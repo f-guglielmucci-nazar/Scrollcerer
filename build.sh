@@ -1,11 +1,11 @@
 #!/bin/bash
-# Builds MouseRemap.app and installs it in /Applications.
+# Builds Scrollmate.app and installs it in /Applications.
 # Usage:  bash build.sh
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP_NAME="MouseRemap"
-BUNDLE_ID="local.mouseremap"
+APP_NAME="Scrollmate"
+BUNDLE_ID="local.scrollmate"
 BUILD_DIR="build"
 APP="$BUILD_DIR/$APP_NAME.app"
 INSTALL_PATH="/Applications/$APP_NAME.app"
@@ -52,5 +52,5 @@ fi
 
 open "$INSTALL_PATH"
 echo
-echo "Done. MouseRemap is in /Applications and running (look for the mouse icon in the menu bar)."
+echo "Done. Scrollmate is in /Applications and running (look for the mouse icon in the menu bar)."
 echo "If asked, allow it under System Settings → Privacy & Security → Accessibility."

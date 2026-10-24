@@ -64,7 +64,7 @@ final class Autoscroller {
     /// Where the pointer is while the button is held. Its drags are swallowed, and then the system's
     /// "current location" stays where it last saw an event, so we follow the drags ourselves.
     private var dragPointer: CGPoint?
-    /// `defaults write local.mouseremap debugScroll -bool true` also logs autoscroll ticks.
+    /// `defaults write local.scrollmate debugScroll -bool true` also logs autoscroll ticks.
     private let debug = UserDefaults.standard.bool(forKey: "debugScroll")
     private var lastDebugLog: TimeInterval = 0
 
@@ -257,7 +257,7 @@ final class Autoscroller {
         e.tagAsOurs()
         if debug, now - lastDebugLog > 0.5 {
             lastDebugLog = now
-            NSLog("MouseRemap autoscroll: \(state) pointer \(p) system \(CGEvent(source: nil)?.location ?? .zero) anchor \(anchor) step \(stepX),\(stepY) onTarget \(pointerOnTarget)")
+            NSLog("Scrollmate autoscroll: \(state) pointer \(p) system \(CGEvent(source: nil)?.location ?? .zero) anchor \(anchor) step \(stepX),\(stepY) onTarget \(pointerOnTarget)")
         }
         if now - lastTargetCheck > 0.1, let target = target {
             lastTargetCheck = now
@@ -307,7 +307,7 @@ final class Autoscroller {
             guard let tap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: .headInsertEventTap,
                                               options: .defaultTap, eventsOfInterest: mask,
                                               callback: autoscrollTapCallback, userInfo: nil) else {
-                NSLog("MouseRemap: couldn't create the autoscroll key/click tap")
+                NSLog("Scrollmate: couldn't create the autoscroll key/click tap")
                 return
             }
             let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
@@ -409,7 +409,7 @@ struct ScrollAxes: Equatable {
 /// Decides, with the Accessibility API, whether a press should autoscroll:
 /// only over a scroll area or web page, and never over a link or a tab.
 enum TargetProbe {
-    static let queue = DispatchQueue(label: "local.mouseremap.autoscroll-probe")
+    static let queue = DispatchQueue(label: "local.scrollmate.autoscroll-probe")
 
     private static let systemWide: AXUIElement = {
         let e = AXUIElementCreateSystemWide()
@@ -481,7 +481,7 @@ enum TargetProbe {
               let attribute = accessibilitySwitch(for: app) else { return false }
         let appElement = AXUIElementCreateApplication(pid)
         AXUIElementSetAttributeValue(appElement, attribute as CFString, kCFBooleanTrue)
-        NSLog("MouseRemap: set \(attribute) on \(app.bundleIdentifier ?? "pid \(pid)")")
+        NSLog("Scrollmate: set \(attribute) on \(app.bundleIdentifier ?? "pid \(pid)")")
         return true
     }
 
