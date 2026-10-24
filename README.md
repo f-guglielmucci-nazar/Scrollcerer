@@ -6,10 +6,11 @@
 
 macOS has no autoscroll. On Windows you click the mouse wheel, move the mouse, and the page scrolls by itself, faster the further you move. Scrollmate brings that to every app on your Mac.
 
+**It knows what you're clicking on.** Before it starts, Scrollmate checks what's under the pointer. Over a page, document or list it starts autoscrolling; over a link, a browser tab, the Dock or a toolbar it sends a normal middle-click instead. So you keep opening links in new tabs and closing tabs with the wheel, and get autoscroll everywhere else, without switching anything on or off.
+
 - **Click** the wheel over a page or list: a round marker appears. Move away from it and the page scrolls that way; the further away, the faster. Nothing scrolls inside a small circle around the marker.
 - **Hold** the wheel and move: scrolls while you hold, stops when you let go.
 - It ends with any click (that click isn't passed on, as on Windows), Esc, any other key (which still types), turning the wheel, or switching apps.
-- Middle-click still works where it matters: a **link** still opens in a new tab, a **browser tab** still closes, and the Dock still gets a normal middle click.
 - Scrolling stays with the window you started in, even if the pointer wanders over another one. The speed is adjustable.
 
 ### 2. Mouse wheel direction separate from the trackpad
