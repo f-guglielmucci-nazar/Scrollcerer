@@ -9,9 +9,13 @@ A small menu-bar app for remapping the extra buttons on a TeckNet MG2511 (or any
 - Press a mouse button in Settings and its row lights up, so you know which physical button is which.
 - Optional "Open at login".
 
-## Install
+## Download
 
-1. Unzip, then open **Terminal** and run (adjust the path if you unzipped somewhere else):
+Get **MouseRemap-x.y.dmg** from the [Releases page](https://github.com/fguglielmuccinazar/MouseRemap/releases/latest), open it, drag MouseRemap into Applications and follow "Read Me First". The first time, macOS blocks it because it isn't from an identified developer: go to **System Settings → Privacy & Security** and click **Open Anyway**.
+
+## Build it yourself
+
+1. Get the code (`git clone https://github.com/fguglielmuccinazar/MouseRemap.git`, or download the ZIP from GitHub and unzip it), then open **Terminal** and run (adjust the path to where the folder is):
 
    ```
    bash ~/Downloads/MouseRemap/build.sh
