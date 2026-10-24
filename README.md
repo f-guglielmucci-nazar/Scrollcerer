@@ -59,3 +59,7 @@ The wheel click does **Autoscroll (Windows style)** out of the box (set it to "D
 - If a side button doesn't light up its row in Settings, the mouse is sending it in a way macOS doesn't treat as a button.
 - If you rebuild the app, macOS will ask for Accessibility permission again — that's expected.
 - To remove it: quit from the menu bar icon, delete `/Applications/MouseRemap.app`, and remove it from the Accessibility list.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
