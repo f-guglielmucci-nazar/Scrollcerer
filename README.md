@@ -1,3 +1,5 @@
+<p align="center"><img src="Assets/logo.png" width="160" alt="Scrollmate logo"></p>
+
 # Scrollmate
 
 **The two things a regular mouse is missing on a Mac.** A small menu-bar app for macOS 13 Ventura or later.
@@ -65,6 +67,7 @@ To make a DMG to share, run `bash make_dmg.sh`. It builds for both Apple silicon
 
 ## Notes
 
+- The logo and app icon are drawn by `Assets/make_icon.swift`; run `bash Assets/make_icon.sh` after changing it.
 - Scrollmate used to be called **MouseRemap**. It brings over MouseRemap's settings the first time it runs and quits MouseRemap if it's open; you can then delete `/Applications/MouseRemap.app` and remove it from the Accessibility list.
 - A **DPI button** is handled inside the mouse itself; macOS never receives it, so no app can remap it.
 - Settings apply to any regular mouse you plug in (macOS doesn't tell apps like this which mouse a click came from).

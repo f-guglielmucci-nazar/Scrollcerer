@@ -34,6 +34,7 @@ xcrun swiftc \
   -o "$APP/Contents/MacOS/$APP_NAME"
 
 cp Info.plist "$APP/Contents/Info.plist"
+cp Assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 codesign --force --sign - "$APP"
 
 # 2. Install (replacing any older copy).

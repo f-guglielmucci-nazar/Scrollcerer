@@ -33,6 +33,7 @@ done
 lipo -create "${WORK}/${APP_NAME}-arm64" "${WORK}/${APP_NAME}-x86_64" -output "$APP/Contents/MacOS/$APP_NAME"
 
 cp Info.plist "$APP/Contents/Info.plist"
+cp Assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 codesign --force --sign - "$APP"
 
 ln -s /Applications "${WORK}/root/Applications"
