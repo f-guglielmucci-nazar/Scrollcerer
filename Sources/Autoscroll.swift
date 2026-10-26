@@ -64,8 +64,6 @@ final class Autoscroller {
     /// Where the pointer is while the button is held. Its drags are swallowed, and then the system's
     /// "current location" stays where it last saw an event, so we follow the drags ourselves.
     private var dragPointer: CGPoint?
-    /// `defaults write local.scrollmate debugScroll -bool true` also logs autoscroll ticks.
-    private let debug = UserDefaults.standard.bool(forKey: "debugScroll")
     private var lastDebugLog: TimeInterval = 0
 
     /// Presses that ended autoscroll are eaten; so are their drags and releases.
@@ -255,9 +253,9 @@ final class Autoscroller {
               let e = CGEvent(scrollWheelEvent2Source: nil, units: .pixel, wheelCount: 2,
                               wheel1: Int32(stepY), wheel2: Int32(stepX), wheel3: 0) else { return }
         e.tagAsOurs()
-        if debug, now - lastDebugLog > 0.5 {
+        if DebugLog.enabled, now - lastDebugLog > 0.5 {
             lastDebugLog = now
-            NSLog("Scrollmate autoscroll: \(state) pointer \(p) system \(CGEvent(source: nil)?.location ?? .zero) anchor \(anchor) step \(stepX),\(stepY) onTarget \(pointerOnTarget)")
+            DebugLog.write("autoscroll: \(state) pointer \(p) system \(CGEvent(source: nil)?.location ?? .zero) anchor \(anchor) step \(stepX),\(stepY) onTarget \(pointerOnTarget)")
         }
         if now - lastTargetCheck > 0.1, let target = target {
             lastTargetCheck = now
@@ -442,11 +440,9 @@ enum TargetProbe {
     private static func element(at p: CGPoint) -> AXUIElement? {
         var element: AXUIElement?
         let err = AXUIElementCopyElementAtPosition(systemWide, Float(p.x), Float(p.y), &element)
+        if err != .success { DebugLog.write("probe: nothing at \(p) (AX error \(err.rawValue))") }
         return err == .success ? element : nil
     }
-
-    /// `defaults write local.scrollmate debugScroll -bool true` logs what was found under the pointer.
-    private static let debug = UserDefaults.standard.bool(forKey: "debugScroll")
 
     /// Lists and tables are scrollable content even when the app (Mac Catalyst / UIKit apps such as
     /// WhatsApp) doesn't put a scroll area around them.
@@ -455,8 +451,15 @@ enum TargetProbe {
     private static func classify(_ start: AXUIElement) -> ScrollAxes? {
         var chain: [String] = []
         let result = walk(from: start, chain: &chain)
-        if debug {
-            NSLog("Scrollmate probe: \(result.map { "scroll h:\($0.horizontal) v:\($0.vertical)" } ?? "pass") ← \(chain.joined(separator: " > "))")
+        if DebugLog.enabled {
+            var pid: pid_t = 0
+            AXUIElementGetPid(start, &pid)
+            var names: CFArray?
+            AXUIElementCopyAttributeNames(start, &names)
+            let app = NSRunningApplication(processIdentifier: pid)?.bundleIdentifier ?? "pid \(pid)"
+            DebugLog.write("probe in \(app): \(result.map { "scroll h:\($0.horizontal) v:\($0.vertical)" } ?? "pass") ← "
+                + chain.joined(separator: " > ")
+                + " | first element's attributes: \((names as? [String])?.joined(separator: ",") ?? "none")")
         }
         return result
     }
@@ -502,7 +505,7 @@ enum TargetProbe {
               let attribute = accessibilitySwitch(for: app) else { return false }
         let appElement = AXUIElementCreateApplication(pid)
         AXUIElementSetAttributeValue(appElement, attribute as CFString, kCFBooleanTrue)
-        NSLog("Scrollmate: set \(attribute) on \(app.bundleIdentifier ?? "pid \(pid)")")
+        DebugLog.write("set \(attribute) on \(app.bundleIdentifier ?? "pid \(pid)")")
         return true
     }
 

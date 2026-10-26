@@ -147,6 +147,30 @@ final class AppStatus: ObservableObject {
     }
 }
 
+/// Debug output, on with `defaults write local.scrollmate debugScroll -bool true`. Written to
+/// ~/Library/Logs/Scrollmate.log because the system log hides the text of NSLog messages.
+enum DebugLog {
+    static let enabled = UserDefaults.standard.bool(forKey: "debugScroll")
+    private static let queue = DispatchQueue(label: "local.scrollmate.debug-log")
+    private static let url = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("Library/Logs/Scrollmate.log")
+
+    static func write(_ message: @autoclosure () -> String) {
+        guard enabled else { return }
+        let line = "\(Date()) \(message())\n"
+        queue.async {
+            guard let data = line.data(using: .utf8) else { return }
+            if let handle = try? FileHandle(forWritingTo: url) {
+                handle.seekToEndOfFile()
+                handle.write(data)
+                try? handle.close()
+            } else {
+                try? data.write(to: url)
+            }
+        }
+    }
+}
+
 enum Permissions {
     static func promptForAccessibility() {
         let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
