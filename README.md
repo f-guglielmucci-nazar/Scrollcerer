@@ -27,7 +27,7 @@ Side buttons work as Back / Forward out of the box. Each side button, the wheel 
 
 ## Download
 
-Get **Scrollmate-x.y.dmg** from the [Releases page](https://github.com/fguglielmuccinazar/Scrollmate/releases/latest), open it, drag Scrollmate into Applications and follow "Read Me First".
+Get **Scrollmate-x.y.dmg** from the [Releases page](https://github.com/f-guglielmucci-nazar/Scrollmate/releases/latest), open it, drag Scrollmate into Applications and follow "Read Me First".
 
 - The first time, macOS blocks it because it isn't from an identified developer. Go to **System Settings → Privacy & Security** and click **Open Anyway**.
 - When asked, switch Scrollmate on under **System Settings → Privacy & Security → Accessibility**. This is what lets it see and change mouse clicks and scrolling.
@@ -48,7 +48,7 @@ Click the mouse icon in the menu bar → **Settings…**.
 
 ## Build it yourself
 
-1. Get the code (`git clone https://github.com/fguglielmuccinazar/Scrollmate.git`, or download the ZIP from GitHub and unzip it), then open **Terminal** and run (adjust the path to where the folder is):
+1. Get the code (`git clone https://github.com/f-guglielmucci-nazar/Scrollmate.git`, or download the ZIP from GitHub and unzip it), then open **Terminal** and run (adjust the path to where the folder is):
 
    ```
    bash ~/Downloads/Scrollmate/build.sh
