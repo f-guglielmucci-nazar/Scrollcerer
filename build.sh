@@ -1,11 +1,11 @@
 #!/bin/bash
-# Builds Scrollmate.app and installs it in /Applications.
+# Builds Scrollcerer.app and installs it in /Applications.
 # Usage:  bash build.sh
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP_NAME="Scrollmate"
-BUNDLE_ID="local.scrollmate"
+APP_NAME="Scrollcerer"
+BUNDLE_ID="local.scrollcerer"
 BUILD_DIR="build"
 APP="$BUILD_DIR/$APP_NAME.app"
 INSTALL_PATH="/Applications/$APP_NAME.app"
@@ -53,5 +53,5 @@ fi
 
 open "$INSTALL_PATH"
 echo
-echo "Done. Scrollmate is in /Applications and running (look for the mouse icon in the menu bar)."
+echo "Done. Scrollcerer is in /Applications and running (look for the mouse icon in the menu bar)."
 echo "If asked, allow it under System Settings → Privacy & Security → Accessibility."

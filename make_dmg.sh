@@ -1,11 +1,11 @@
 #!/bin/bash
-# Builds a universal (Apple silicon + Intel) Scrollmate.app and packs it into
-# dist/Scrollmate-<version>.dmg for sharing. Doesn't touch the installed copy.
+# Builds a universal (Apple silicon + Intel) Scrollcerer.app and packs it into
+# dist/Scrollcerer-<version>.dmg for sharing. Doesn't touch the installed copy.
 # Usage:  bash make_dmg.sh
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP_NAME="Scrollmate"
+APP_NAME="Scrollcerer"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Info.plist)"
 WORK="build/dmg"
 APP="${WORK}/root/${APP_NAME}.app"
@@ -38,16 +38,16 @@ codesign --force --sign - "$APP"
 
 ln -s /Applications "${WORK}/root/Applications"
 cat > "${WORK}/root/Read Me First.txt" <<'EOF'
-Scrollmate — install
+Scrollcerer — install
 
-1. Drag Scrollmate into the Applications folder.
+1. Drag Scrollcerer into the Applications folder.
 
 2. Open it. macOS will say it can't check it for malicious software,
    because it isn't from an identified developer. Click Done (or OK), then:
-   System Settings → Privacy & Security → scroll down → "Scrollmate was
+   System Settings → Privacy & Security → scroll down → "Scrollcerer was
    blocked…" → Open Anyway, and confirm.
 
-3. A mouse icon appears in the menu bar. When asked, switch Scrollmate on in
+3. A mouse icon appears in the menu bar. When asked, switch Scrollcerer on in
    System Settings → Privacy & Security → Accessibility.
 
 Settings are under the menu-bar icon → Settings…

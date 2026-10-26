@@ -29,7 +29,7 @@ final class SmoothScroller {
     /// A gesture has begun and not ended yet.
     private var gliding = false
     private var timer: DispatchSourceTimer?
-    private let queue = DispatchQueue(label: "local.scrollmate.smooth", qos: .userInteractive)
+    private let queue = DispatchQueue(label: "local.scrollcerer.smooth", qos: .userInteractive)
 
     // kCGScrollWheelEventScrollPhase and its values.
     private static let phaseField = CGEventField(rawValue: 99)

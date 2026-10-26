@@ -305,7 +305,7 @@ final class Autoscroller {
             guard let tap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: .headInsertEventTap,
                                               options: .defaultTap, eventsOfInterest: mask,
                                               callback: autoscrollTapCallback, userInfo: nil) else {
-                NSLog("Scrollmate: couldn't create the autoscroll key/click tap")
+                NSLog("Scrollcerer: couldn't create the autoscroll key/click tap")
                 return
             }
             let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
@@ -407,7 +407,7 @@ struct ScrollAxes: Equatable {
 /// Decides, with the Accessibility API, whether a press should autoscroll:
 /// only over a scroll area or web page, and never over a link or a tab.
 enum TargetProbe {
-    static let queue = DispatchQueue(label: "local.scrollmate.autoscroll-probe")
+    static let queue = DispatchQueue(label: "local.scrollcerer.autoscroll-probe")
 
     private static let systemWide: AXUIElement = {
         let e = AXUIElementCreateSystemWide()

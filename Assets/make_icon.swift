@@ -1,4 +1,4 @@
-// Draws the Scrollmate logo and builds the app icon.
+// Draws the Scrollcerer logo and builds the app icon.
 // Usage:  bash Assets/make_icon.sh   (or: xcrun swift Assets/make_icon.swift [mouse|marker] [output folder])
 // Writes logo.png (1024 px) and AppIcon.icns into the output folder.
 import AppKit

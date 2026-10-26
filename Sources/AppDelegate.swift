@@ -8,13 +8,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var permissionTimer: Timer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // The app used to be called MouseRemap; two copies would remap every event twice.
-        for old in NSRunningApplication.runningApplications(withBundleIdentifier: "local.mouseremap") {
-            old.terminate()
+        // Earlier versions under another name would remap every event a second time.
+        for id in Config.oldBundleIDs {
+            NSRunningApplication.runningApplications(withBundleIdentifier: id).forEach { $0.terminate() }
         }
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         if let button = statusItem.button {
-            if let image = NSImage(systemSymbolName: "computermouse", accessibilityDescription: "Scrollmate") {
+            if let image = NSImage(systemSymbolName: "computermouse", accessibilityDescription: "Scrollcerer") {
                 image.isTemplate = true
                 button.image = image
             } else {
@@ -75,7 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(item("Settings…", #selector(showSettings), key: ","))
         menu.addItem(.separator())
-        menu.addItem(item("Quit Scrollmate", #selector(quit), key: "q"))
+        menu.addItem(item("Quit Scrollcerer", #selector(quit), key: "q"))
     }
 
     private func item(_ title: String, _ action: Selector, key: String = "") -> NSMenuItem {
@@ -94,7 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             let host = NSHostingController(rootView: SettingsView())
             host.sizingOptions = [.preferredContentSize] // window grows/shrinks with the content
             let window = NSWindow(contentViewController: host)
-            window.title = "Scrollmate"
+            window.title = "Scrollcerer"
             window.styleMask = [.titled, .closable]
             window.isReleasedWhenClosed = false
             window.center()

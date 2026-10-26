@@ -69,12 +69,17 @@ final class Config: ObservableObject {
         extraButtons = d.array(forKey: "extraButtons") as? [Int] ?? []
     }
 
-    /// The app used to be called MouseRemap (bundle id local.mouseremap). Bring its settings over once.
+    /// Earlier names of the app (Scrollmate, MouseRemap), newest first.
+    static let oldBundleIDs = ["local.scrollmate", "local.mouseremap"]
+
+    /// Brings over the settings of the most recent earlier version, once.
     private static func importOldSettings(into d: UserDefaults) {
         guard !d.bool(forKey: "importedOldSettings") else { return }
         d.set(true, forKey: "importedOldSettings")
-        guard let old = UserDefaults(suiteName: "local.mouseremap")?.persistentDomain(forName: "local.mouseremap") else { return }
-        for key in ["enabled", "reverseWheel", "linearWheel", "wheelLines", "autoscrollSpeed",
+        guard let old = oldBundleIDs.lazy.compactMap({ UserDefaults.standard.persistentDomain(forName: $0) }).first
+        else { return }
+        for key in ["enabled", "reverseWheel", "linearWheel", "wheelLines", "smoothScroll",
+                    "wheelZoom", "zoomWithCommand", "autoscrollSpeed",
                     "mappings", "extraButtons", "launchedBefore"] where d.object(forKey: key) == nil {
             if let value = old[key] { d.set(value, forKey: key) }
         }
@@ -165,13 +170,13 @@ final class AppStatus: ObservableObject {
     }
 }
 
-/// Debug output, on with `defaults write local.scrollmate debugScroll -bool true`. Written to
-/// ~/Library/Logs/Scrollmate.log because the system log hides the text of NSLog messages.
+/// Debug output, on with `defaults write local.scrollcerer debugScroll -bool true`. Written to
+/// ~/Library/Logs/Scrollcerer.log because the system log hides the text of NSLog messages.
 enum DebugLog {
     static let enabled = UserDefaults.standard.bool(forKey: "debugScroll")
-    private static let queue = DispatchQueue(label: "local.scrollmate.debug-log")
+    private static let queue = DispatchQueue(label: "local.scrollcerer.debug-log")
     private static let url = FileManager.default.homeDirectoryForCurrentUser
-        .appendingPathComponent("Library/Logs/Scrollmate.log")
+        .appendingPathComponent("Library/Logs/Scrollcerer.log")
 
     static func write(_ message: @autoclosure () -> String) {
         guard enabled else { return }
@@ -210,7 +215,7 @@ enum Permissions {
         do {
             if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
         } catch {
-            NSLog("Scrollmate: login item change failed: \(error)")
+            NSLog("Scrollcerer: login item change failed: \(error)")
         }
         return launchAtLogin
     }
