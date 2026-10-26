@@ -445,32 +445,53 @@ enum TargetProbe {
         return err == .success ? element : nil
     }
 
+    /// `defaults write local.scrollmate debugScroll -bool true` logs what was found under the pointer.
+    private static let debug = UserDefaults.standard.bool(forKey: "debugScroll")
+
+    /// Lists and tables are scrollable content even when the app (Mac Catalyst / UIKit apps such as
+    /// WhatsApp) doesn't put a scroll area around them.
+    private static let listRoles: Set<String> = [kAXListRole, kAXTableRole, kAXOutlineRole, kAXBrowserRole]
+
     private static func classify(_ start: AXUIElement) -> ScrollAxes? {
+        var chain: [String] = []
+        let result = walk(from: start, chain: &chain)
+        if debug {
+            NSLog("Scrollmate probe: \(result.map { "scroll h:\($0.horizontal) v:\($0.vertical)" } ?? "pass") ← \(chain.joined(separator: " > "))")
+        }
+        return result
+    }
+
+    private static func walk(from start: AXUIElement, chain: inout [String]) -> ScrollAxes? {
         var current: AXUIElement? = start
+        var sawList = false
+        let both = ScrollAxes(horizontal: true, vertical: true)
         for _ in 0..<25 {
-            guard let el = current else { return nil }
+            guard let el = current else { break }
             let role = string(el, kAXRoleAttribute) ?? ""
             let subrole = string(el, kAXSubroleAttribute) ?? ""
+            chain.append(subrole.isEmpty ? role : "\(role)/\(subrole)")
             switch role {
             case "AXLink", kAXTabGroupRole:
                 return nil
             case "AXWebArea":
                 // Web pages: inner scrollable boxes don't show up as scroll areas, so allow both.
-                return ScrollAxes(horizontal: true, vertical: true)
+                return both
             case kAXScrollAreaRole:
                 let v = has(el, kAXVerticalScrollBarAttribute)
                 let h = has(el, kAXHorizontalScrollBarAttribute)
-                if !v && !h { return ScrollAxes(horizontal: true, vertical: true) } // can't tell
+                if !v && !h { return both } // can't tell
                 return ScrollAxes(horizontal: h, vertical: v)
-            case kAXWindowRole, kAXApplicationRole, kAXMenuBarRole, kAXMenuRole, kAXMenuItemRole, "AXDockItem":
+            case kAXWindowRole, kAXApplicationRole:
+                return sawList ? both : nil
+            case kAXMenuBarRole, kAXMenuRole, kAXMenuItemRole, "AXDockItem":
                 return nil
             default:
-                break
+                if listRoles.contains(role) { sawList = true }
             }
             if subrole == "AXTabButton" { return nil }
             current = parent(el)
         }
-        return nil
+        return sawList ? both : nil
     }
 
     /// Chromium and Electron apps only build their AX tree when asked. Returns true if we just asked.
