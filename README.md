@@ -20,6 +20,7 @@ macOS has no autoscroll. On Windows you click the mouse wheel, move the mouse, a
 On a Mac, the mouse wheel and the trackpad share one "Natural scrolling" switch. Choose the direction that feels right on the trackpad, and the mouse wheel goes the "wrong" way, and vice versa. Scrollmate fixes the wheel without touching the trackpad:
 
 - **Reverse the wheel direction**, mouse only.
+- **Smooth scrolling**: each notch glides the same distance instead of jumping, like on a trackpad.
 - **Turn off scroll acceleration**, so every notch scrolls the same amount however fast you spin.
 - Choose **how many lines each notch scrolls**.
 - **Ctrl + wheel zooms** in and out, as on Windows (turn it on in Settings; you can pick ⌘ + wheel instead). It works in any app that zooms with ⌘+ / ⌘−: browsers, Preview, VS Code, Office… If you use macOS's screen zoom with Ctrl + scroll (Accessibility → Zoom), pick ⌘ + wheel so the two don't clash.

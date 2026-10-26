@@ -108,6 +108,16 @@ final class Remapper {
             Remapper.rewrite(event, Remapper.horizontal, shape)
 
             DebugLog.write("scroll out: \(Remapper.describe(event))")
+
+            // Smooth scrolling: swallow the jump and glide the same distance instead.
+            if config.smoothScroll {
+                let lines = (x: event.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis2),
+                             y: event.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis1))
+                if lines.x != 0 || lines.y != 0 {
+                    SmoothScroller.shared.add(linesX: lines.x, linesY: lines.y, flags: event.flags)
+                    return nil
+                }
+            }
             return pass
 
         case .otherMouseDown, .otherMouseUp, .otherMouseDragged:

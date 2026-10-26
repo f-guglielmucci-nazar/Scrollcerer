@@ -42,6 +42,8 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Toggle("Reverse scroll direction for the mouse wheel (trackpad stays as it is)",
                            isOn: $config.reverseWheel)
+                    Toggle("Smooth scrolling: each notch glides instead of jumping",
+                           isOn: $config.smoothScroll)
                     Toggle("Turn off scroll acceleration for the mouse wheel",
                            isOn: $config.linearWheel)
                     HStack(spacing: 8) {

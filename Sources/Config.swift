@@ -25,6 +25,10 @@ final class Config: ObservableObject {
     @Published var zoomWithCommand: Bool {
         didSet { UserDefaults.standard.set(zoomWithCommand, forKey: "zoomWithCommand") }
     }
+    /// Mouse wheel notches glide instead of jumping.
+    @Published var smoothScroll: Bool {
+        didSet { UserDefaults.standard.set(smoothScroll, forKey: "smoothScroll") }
+    }
     /// Lines per wheel notch; 0 = leave it to macOS.
     @Published var wheelLines: Int {
         didSet { UserDefaults.standard.set(wheelLines, forKey: "wheelLines") }
@@ -51,6 +55,7 @@ final class Config: ObservableObject {
         linearWheel = d.bool(forKey: "linearWheel")
         wheelLines = d.integer(forKey: "wheelLines")
         wheelZoom = d.bool(forKey: "wheelZoom")
+        smoothScroll = d.bool(forKey: "smoothScroll")
         zoomWithCommand = d.bool(forKey: "zoomWithCommand")
         if let data = d.data(forKey: "mappings"),
            let saved = try? JSONDecoder().decode([Int: ButtonAction].self, from: data) {
@@ -117,6 +122,7 @@ final class Config: ObservableObject {
         linearWheel = false
         wheelLines = 0
         wheelZoom = false
+        smoothScroll = false
         zoomWithCommand = false
         enabled = true
         save()
