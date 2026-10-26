@@ -77,9 +77,10 @@ final class Remapper {
             guard config.enabled, isMouseWheel else { return pass }
             DebugLog.write("scroll in:  \(Remapper.describe(event))")
 
-            // ⌘ + wheel zooms, like Ctrl + wheel on Windows.
+            // Ctrl (or ⌘) + wheel zooms, as on Windows.
+            let zoomModifier: CGEventFlags = config.zoomWithCommand ? .maskCommand : .maskControl
             if config.wheelZoom,
-               event.flags.intersection([.maskCommand, .maskShift, .maskAlternate, .maskControl]) == .maskCommand {
+               event.flags.intersection([.maskCommand, .maskShift, .maskAlternate, .maskControl]) == zoomModifier {
                 let amount = event.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis1)
                 if amount != 0 {
                     // Natural scrolling has already flipped the delta; undo that to get the physical direction.

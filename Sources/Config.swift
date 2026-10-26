@@ -17,9 +17,13 @@ final class Config: ObservableObject {
     @Published var linearWheel: Bool {
         didSet { UserDefaults.standard.set(linearWheel, forKey: "linearWheel") }
     }
-    /// ⌘ + mouse wheel zooms in / out.
+    /// Holding a modifier and turning the mouse wheel zooms in / out.
     @Published var wheelZoom: Bool {
         didSet { UserDefaults.standard.set(wheelZoom, forKey: "wheelZoom") }
+    }
+    /// Which modifier: Control (as on Windows, the default) or Command.
+    @Published var zoomWithCommand: Bool {
+        didSet { UserDefaults.standard.set(zoomWithCommand, forKey: "zoomWithCommand") }
     }
     /// Lines per wheel notch; 0 = leave it to macOS.
     @Published var wheelLines: Int {
@@ -47,6 +51,7 @@ final class Config: ObservableObject {
         linearWheel = d.bool(forKey: "linearWheel")
         wheelLines = d.integer(forKey: "wheelLines")
         wheelZoom = d.bool(forKey: "wheelZoom")
+        zoomWithCommand = d.bool(forKey: "zoomWithCommand")
         if let data = d.data(forKey: "mappings"),
            let saved = try? JSONDecoder().decode([Int: ButtonAction].self, from: data) {
             var saved = saved
@@ -112,6 +117,7 @@ final class Config: ObservableObject {
         linearWheel = false
         wheelLines = 0
         wheelZoom = false
+        zoomWithCommand = false
         enabled = true
         save()
     }

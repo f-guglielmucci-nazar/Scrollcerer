@@ -20,7 +20,7 @@ On a Mac, the mouse wheel and the trackpad share one "Natural scrolling" switch.
 - **Reverse the wheel direction**, mouse only.
 - **Turn off scroll acceleration**, so every notch scrolls the same amount however fast you spin.
 - Choose **how many lines each notch scrolls**.
-- **⌘ + wheel zooms** in and out, like Ctrl + wheel on Windows (turn it on in Settings). It works in any app that zooms with ⌘+ / ⌘−: browsers, Preview, VS Code, Office… Apps that already zoom with ⌘ + wheel on their own (Figma, Photoshop) do it more smoothly, so you may want it off if you use those.
+- **Ctrl + wheel zooms** in and out, as on Windows (turn it on in Settings; you can pick ⌘ + wheel instead). It works in any app that zooms with ⌘+ / ⌘−: browsers, Preview, VS Code, Office… If you use macOS's screen zoom with Ctrl + scroll (Accessibility → Zoom), pick ⌘ + wheel so the two don't clash.
 
 ### Plus: remap the extra buttons
 

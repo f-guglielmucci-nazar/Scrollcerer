@@ -62,8 +62,16 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
-                    Toggle("⌘ + wheel zooms in and out (like Ctrl + wheel on Windows)",
-                           isOn: $config.wheelZoom)
+                    HStack(spacing: 8) {
+                        Toggle("Zoom in and out with", isOn: $config.wheelZoom)
+                        Picker("", selection: $config.zoomWithCommand) {
+                            Text("⌃ Control + wheel").tag(false)
+                            Text("⌘ Command + wheel").tag(true)
+                        }
+                        .labelsHidden()
+                        .frame(width: 180)
+                        .disabled(!config.wheelZoom)
+                    }
                     Text("These only change the mouse wheel; the trackpad stays as it is.")
                         .font(.caption)
                         .foregroundColor(.secondary)
