@@ -77,6 +77,19 @@ final class Remapper {
             guard config.enabled, isMouseWheel else { return pass }
             DebugLog.write("scroll in:  \(Remapper.describe(event))")
 
+            // ⌘ + wheel zooms, like Ctrl + wheel on Windows.
+            if config.wheelZoom,
+               event.flags.intersection([.maskCommand, .maskShift, .maskAlternate, .maskControl]) == .maskCommand {
+                let amount = event.getDoubleValueField(.scrollWheelEventFixedPtDeltaAxis1)
+                if amount != 0 {
+                    // Natural scrolling has already flipped the delta; undo that to get the physical direction.
+                    let inverted = NSEvent(cgEvent: event)?.isDirectionInvertedFromDevice ?? false
+                    let awayFromUser = (amount > 0) != inverted
+                    DispatchQueue.main.async { Actions.zoom(in: awayFromUser) }
+                    return nil
+                }
+            }
+
             // Lines per notch: with acceleration off every notch scrolls exactly that many lines;
             // with it on, the accelerated amount is multiplied instead.
             let lines = Double(config.wheelLines)

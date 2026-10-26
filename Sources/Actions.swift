@@ -179,6 +179,15 @@ enum Actions {
         }
     }
 
+    /// ⌘ plus the key that types "+" (or "=") / "-" on the current layout: the same as zooming from the keyboard.
+    static func zoom(in zoomIn: Bool) {
+        if zoomIn {
+            post(keyCode(typing: "+") ?? keyCode(typing: "=") ?? 24, .maskCommand)
+        } else {
+            post(keyCode(typing: "-") ?? 27, .maskCommand)
+        }
+    }
+
     // MARK: - Media keys
 
     private static func media(_ key: Int32) {

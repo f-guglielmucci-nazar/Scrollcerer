@@ -17,6 +17,10 @@ final class Config: ObservableObject {
     @Published var linearWheel: Bool {
         didSet { UserDefaults.standard.set(linearWheel, forKey: "linearWheel") }
     }
+    /// ⌘ + mouse wheel zooms in / out.
+    @Published var wheelZoom: Bool {
+        didSet { UserDefaults.standard.set(wheelZoom, forKey: "wheelZoom") }
+    }
     /// Lines per wheel notch; 0 = leave it to macOS.
     @Published var wheelLines: Int {
         didSet { UserDefaults.standard.set(wheelLines, forKey: "wheelLines") }
@@ -42,6 +46,7 @@ final class Config: ObservableObject {
         autoscrollSpeed = d.object(forKey: "autoscrollSpeed") as? Double ?? 1.0
         linearWheel = d.bool(forKey: "linearWheel")
         wheelLines = d.integer(forKey: "wheelLines")
+        wheelZoom = d.bool(forKey: "wheelZoom")
         if let data = d.data(forKey: "mappings"),
            let saved = try? JSONDecoder().decode([Int: ButtonAction].self, from: data) {
             var saved = saved
@@ -106,6 +111,7 @@ final class Config: ObservableObject {
         autoscrollSpeed = 1.0
         linearWheel = false
         wheelLines = 0
+        wheelZoom = false
         enabled = true
         save()
     }
