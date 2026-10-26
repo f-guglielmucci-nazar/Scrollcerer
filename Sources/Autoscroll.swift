@@ -444,8 +444,7 @@ enum TargetProbe {
         return err == .success ? element : nil
     }
 
-    /// Lists and tables are scrollable content even when the app (Mac Catalyst / UIKit apps such as
-    /// WhatsApp) doesn't put a scroll area around them.
+    /// Lists and tables are scrollable content even when an app doesn't put a scroll area around them.
     private static let listRoles: Set<String> = [kAXListRole, kAXTableRole, kAXOutlineRole, kAXBrowserRole]
 
     private static func classify(_ start: AXUIElement) -> ScrollAxes? {
@@ -467,6 +466,9 @@ enum TargetProbe {
     private static func walk(from start: AXUIElement, chain: inout [String]) -> ScrollAxes? {
         var current: AXUIElement? = start
         var sawList = false
+        // iPad-style (Mac Catalyst) apps such as WhatsApp show their whole content as plain groups inside
+        // one "iOSContentGroup", with no scroll areas at all, so anything in there (bar links/tabs) counts.
+        var inCatalystContent = false
         let both = ScrollAxes(horizontal: true, vertical: true)
         for _ in 0..<25 {
             guard let el = current else { break }
@@ -485,16 +487,17 @@ enum TargetProbe {
                 if !v && !h { return both } // can't tell
                 return ScrollAxes(horizontal: h, vertical: v)
             case kAXWindowRole, kAXApplicationRole:
-                return sawList ? both : nil
+                return sawList || inCatalystContent ? both : nil
             case kAXMenuBarRole, kAXMenuRole, kAXMenuItemRole, "AXDockItem":
                 return nil
             default:
                 if listRoles.contains(role) { sawList = true }
             }
             if subrole == "AXTabButton" { return nil }
+            if subrole == "iOSContentGroup" { inCatalystContent = true }
             current = parent(el)
         }
-        return sawList ? both : nil
+        return sawList || inCatalystContent ? both : nil
     }
 
     /// Chromium and Electron apps only build their AX tree when asked. Returns true if we just asked.
