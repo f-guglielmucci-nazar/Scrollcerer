@@ -36,8 +36,8 @@ enum ActionKind: String, Codable, CaseIterable, Identifiable {
         case .disabled:       return "Do nothing"
         case .middleClick:    return "Middle click"
         case .autoscroll:     return "Autoscroll (Windows style)"
-        case .back:           return "Back  ⌘["
-        case .forward:        return "Forward  ⌘]"
+        case .back:           return "Back"
+        case .forward:        return "Forward"
         case .nextTab:        return "Next tab  ⌃⇥"
         case .previousTab:    return "Previous tab  ⌃⇧⇥"
         case .closeTab:       return "Close tab/window  ⌘W"
@@ -84,8 +84,8 @@ enum Actions {
         switch action.kind {
         case .passthrough, .disabled, .middleClick, .autoscroll:
             break // handled directly in the event tap
-        case .back:           appKey(kLeftBracket, .maskCommand, char: "[")
-        case .forward:        appKey(kRightBracket, .maskCommand, char: "]")
+        case .back:           appKey(kLeftBracket, .maskCommand, char: "[", alternatives: ["{"])
+        case .forward:        appKey(kRightBracket, .maskCommand, char: "]", alternatives: ["}"])
         case .nextTab:        post(kTab, .maskControl)
         case .previousTab:    post(kTab, [.maskControl, .maskShift])
         case .closeTab:       appKey(kW, .maskCommand, char: "w")
@@ -117,12 +117,17 @@ enum Actions {
 
     /// App menu shortcuts match on the typed character, so find which key types that
     /// character on the current keyboard layout (matters for AZERTY, QWERTZ, Italian…).
-    private static func appKey(_ usCode: CGKeyCode, _ flags: CGEventFlags, char: Character) {
-        if let code = keyCode(typing: char) {
-            post(code, flags)
-        } else {
-            post(usCode, flags, text: String(char))
+    /// `alternatives` are what macOS moves the shortcut to on layouts that can't type `char`
+    /// without modifiers: on a Latin American keyboard, for example, ⌘[ / ⌘] become ⌘{ / ⌘}.
+    private static func appKey(_ usCode: CGKeyCode, _ flags: CGEventFlags, char: Character,
+                               alternatives: [Character] = []) {
+        for c in [char] + alternatives {
+            if let code = keyCode(typing: c) {
+                post(code, flags)
+                return
+            }
         }
+        post(usCode, flags, text: String(char))
     }
 
     static func post(_ code: CGKeyCode, _ flags: CGEventFlags, text: String? = nil) {
